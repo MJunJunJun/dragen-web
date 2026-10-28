@@ -3,24 +3,157 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DraGen</title>
-<style>
-  :root { --bg: #fbfaf7; --text: #1f2328; --muted: #59636e; --accent: #9a3b12; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #15171a; --text: #e6e8eb; --muted: #9aa4ae; --accent: #f0a070; } }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 780px; margin: 0 auto; padding: 40px 16px; }
-  a { color: var(--accent); }
-  p { color: var(--muted); }
-</style>
+<title>DraGen — Raise dragons on your desk</title>
+<meta name="description" content="DraGen is a mixed-reality dragon game for Meta Quest. A floating island lands on your table: hatch eggs, raise dragons and battle friends using your hands.">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="DraGen — Raise dragons on your desk">
+<meta property="og:description" content="A mixed-reality dragon game for Meta Quest by Arjun Technology.">
+<meta property="og:image" content="https://dragen.arjuntech.id/assets/img/og.jpg">
+<meta property="og:url" content="https://dragen.arjuntech.id/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
+<div class="backdrop" aria-hidden="true"></div>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="26">DraGen</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#features">Features</a>
+      <a class="hide-sm" href="#world">World</a>
+      <a href="#community">Community</a>
+      <a class="hide-sm" href="/privacy">Privacy</a>
+    </nav>
+  </div>
+</header>
+
 <main>
-<h1>DraGen</h1>
-<p>A mixed-reality dragon-raising game for Meta Quest by Arjun Technology.</p>
-<ul>
-<li><a href="privacy/">Privacy Policy</a></li>
-<li>Contact: <a href="mailto:admin@arjuntech.id">admin@arjuntech.id</a></li>
-</ul>
+  <section class="wrap hero">
+    <div>
+      <span class="eyebrow">Mixed reality · Meta Quest 3 / 3S</span>
+      <h1>Raise dragons <em>on your desk.</em></h1>
+      <p class="lede">DraGen lands a floating island on your table. Hatch eggs, raise dragons, tend your gardens and battle friends, all with your bare hands.</p>
+      <div class="cta">
+        <span class="btn btn-primary" aria-disabled="true">Coming soon to Meta Quest</span>
+        <a class="btn" href="#features">Explore features <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+    <figure style="margin:0">
+      <div class="frame">
+        <img src="/assets/img/island.jpg" alt="The DraGen main island floating in front of the player, with the Hatching Altar, dragon habitat, gardens and the Bag, Shop, Friends and Settings islands around it." width="1280" height="720" fetchpriority="high">
+      </div>
+      <figcaption class="caption"><span>// main island · in-engine capture</span><span>v0.1 · in development</span></figcaption>
+    </figure>
+  </section>
+
+  <div class="wrap">
+    <dl class="specs">
+      <div class="spec"><dt>Platform</dt><dd>Meta Quest 3 · 3S</dd></div>
+      <div class="spec"><dt>Input</dt><dd>Hands first, controllers too</dd></div>
+      <div class="spec"><dt>Mode</dt><dd>Mixed reality, tabletop</dd></div>
+      <div class="spec"><dt>Status</dt><dd>In development</dd></div>
+    </dl>
+  </div>
+
+  <section id="features" class="wrap section">
+    <div class="section-head">
+      <span class="eyebrow">01 — Features</span>
+      <h2>The island is the menu.</h2>
+      <p>No floating panels. Every action lives on something you can touch: a treasure chest, a market stall, a castle, a battle gate.</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3c-3.6 0-6.5 5.2-6.5 9.4a6.5 6.5 0 0 0 13 0C18.5 8.2 15.6 3 12 3z"/><path d="M8.5 13.5 10.5 12l2 1.5 2-1.5"/></svg></div>
+        <h3>Hatch and raise</h3>
+        <p>Place eggs on the Hatching Altar, watch them crack open, then feed and level up your dragons in their habitats.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0v1"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.3l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/></svg></div>
+        <h3>Hands first</h3>
+        <p>Touch, hold and pinch. Buttons are 3D tokens you press with your fingertips. Controllers work too.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
+        <h3>Mixed reality</h3>
+        <p>Your island sits on your real desk through passthrough. Move it, turn it and scale it with both hands.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="M5 14l4 4"/><path d="M7 17l-3 3"/><path d="M3 19l2 2"/></svg></div>
+        <h3>3v3 dragon battles</h3>
+        <p>Pick a team of three and fight across the table. Charge god powers and aim them by touching an enemy dragon.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg></div>
+        <h3>Play with friends</h3>
+        <p>Visit friends' islands, send gifts, text and voice notes, and challenge them to live battles with voice chat.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M20.4 3.5 16 2a4 4 0 0 1-8 0L3.6 3.5a2 2 0 0 0-1.3 2.2l.6 3.5a1 1 0 0 0 1 .8H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.1a1 1 0 0 0 1-.8l.6-3.5a2 2 0 0 0-1.3-2.2z"/></svg></div>
+        <h3>Make it yours</h3>
+        <p>Dress your avatar with outfit sets and accessories, and plant gardens that keep your dragons fed.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <span class="eyebrow">02 — How it plays</span>
+      <h2>Three moves to start.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="num">01</span><h3>Place your island</h3><p>Look at your desk and set the island down. It stays anchored where you put it.</p></div>
+      <div class="step"><span class="num">02</span><h3>Touch to play</h3><p>Reach out and press what you want: an egg, a dragon, a chest, a gate.</p></div>
+      <div class="step"><span class="num">03</span><h3>Hatch, raise, battle</h3><p>Grow your team, take on stages, then call a friend over for a rematch.</p></div>
+    </div>
+  </section>
+
+  <section id="world" class="wrap section">
+    <div class="section-head">
+      <span class="eyebrow">03 — Living world</span>
+      <h2>Weather rolls over your island.</h2>
+      <p>Rain and lightning fall from the clouds, snow settles on the cliffs, and some nights the moon turns red.</p>
+    </div>
+    <div class="gallery">
+      <figure>
+        <div class="frame"><img src="/assets/img/weather-snow.jpg" alt="The island covered in snow under white clouds, with the Hatching Altar and Battle island in view." width="1030" height="580" loading="lazy"></div>
+        <figcaption><strong>Snowfall</strong><span>Cliffs and paths turn white while your dragons keep playing.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="/assets/img/weather-bloodmoon.jpg" alt="The island bathed in red light under crimson clouds during a blood moon." width="1030" height="580" loading="lazy"></div>
+        <figcaption><strong>Blood moon</strong><span>A rare night when the whole sky glows red.</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="community" class="wrap section">
+    <div class="panel">
+      <div>
+        <span class="eyebrow">04 — Community</span>
+        <h2>Join the dragon keepers.</h2>
+        <p>Our Discord opens soon: dev updates, playtests and early access. Until then, say hi by email.</p>
+      </div>
+      <div class="cta">
+        <span class="btn" aria-disabled="true"><span class="dot" aria-hidden="true"></span>Discord · opening soon</span>
+        <a class="btn" href="mailto:admin@arjuntech.id">admin@arjuntech.id</a>
+      </div>
+    </div>
+  </section>
 </main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>© 2026 Arjun Technology · Central Java, Indonesia</span>
+    <nav aria-label="Footer">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="mailto:admin@arjuntech.id">Contact</a>
+    </nav>
+  </div>
+</footer>
 </body>
 </html>
