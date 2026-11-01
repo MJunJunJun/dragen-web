@@ -100,7 +100,8 @@ a { color: inherit; }
 /* hero 3D (assets/hero/hero.js): pulau, naga, burung & awan dari game, selebar layar di belakang teks. Gambar statis di
    bingkai tetap jadi cadangan sampai kanvas siap (atau bila WebGL tidak ada) */
 .hero-wrap { position: relative; }
-.hero-stage { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .9s ease; touch-action: pan-y; cursor: grab; overflow: hidden; }
+.hero-stage { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .9s ease; touch-action: pan-y; cursor: grab; overflow: hidden;
+  --hero3d: 1; /* hero.js baru aktif bila penanda ini ada (CSS lama dari cache = tetap gambar statis) */ }
 .hero-stage:active { cursor: grabbing; }
 .hero-stage canvas { display: block; width: 100%; height: 100%; }
 .hero-stage .hero-note { position: absolute; right: 24px; bottom: 16px; font: 400 12px/1.4 var(--mono); color: var(--muted); pointer-events: none; }

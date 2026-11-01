@@ -11,6 +11,11 @@
   const wrapEl = document.querySelector('.hero-wrap');
   const stage = document.getElementById('hero-stage');
   if (!wrapEl || !stage || !window.THREE || !window.NagaDragon) return;
+  // CSS hero 3D harus sudah termuat (site.css lama dari cache browser = panggung tanpa gaya): tanpa penanda, tetap gambar statis
+  if (getComputedStyle(stage).getPropertyValue('--hero3d').trim() !== '1') return;
+  // versi aset = ?v= skrip ini (data & tekstur ikut berganti saat versi naik, tidak tertahan cache 1 hari /assets)
+  const VER = (document.currentScript && new URL(document.currentScript.src, location.href).searchParams.get('v')) || '';
+  const q = VER ? '?v=' + VER : '';
   const T = THREE, N = NagaDragon;
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -19,6 +24,7 @@
   catch (e) { return; }
   if (!renderer.getContext()) return;
   renderer.setClearColor(0x000000, 0);
+  stage.hidden = false;
   stage.appendChild(renderer.domElement);
 
   const scene = new T.Scene();
@@ -586,7 +592,7 @@
     cy = data.cy || 0;
     yOff = -cy;
     const loader = new T.TextureLoader();
-    const tex = (data.tex || []).map(n => { const t = loader.load('/assets/hero/' + n); t.anisotropy = 4; return t; });
+    const tex = (data.tex || []).map(n => { const t = loader.load('/assets/hero/' + n + q); t.anisotropy = 4; return t; });
     geos = data.meshes.map(geometry);
     mats = data.mats.map(d => material(d, tex, false));
     vcMats = data.mats.map(d => material(d, tex, true));
@@ -680,7 +686,7 @@
     // satu frame dulu, baru tampil (gambar statis disembunyikan sesudah kanvas siap)
     step(0); renderer.render(scene, cam);
     wrapEl.classList.add('has-3d');
-    if (location.search.indexOf('hero-debug') >= 0) window.__hero = { scene, cam, view, sky, dragons, birds, clouds, renderer };
+    if (location.search.indexOf('hero-debug') >= 0) window.__hero = { scene, cam, view, sky, dragons, birds, clouds, renderer, life };
     requestAnimationFrame(loop);
   }
 
@@ -713,5 +719,5 @@
   }
   if ('IntersectionObserver' in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(stage);
 
-  fetch('/assets/hero/island.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(build).catch(() => { running = false; });
+  fetch('/assets/hero/island.json' + q).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(build).catch(() => { running = false; });
 })();
