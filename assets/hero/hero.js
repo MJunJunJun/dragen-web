@@ -534,9 +534,13 @@
   let cy = 0, focus = 1;
 
   // ---------- kamera: putar pelan + seret ----------
-  const view = { theta: .55, phi: 1.1, r: 150, target: V3(0, 2, 0), vel: 0, drag: null, auto: reduce ? 0 : .045 };
+  // Seret ke kiri/kanan sama ringannya: selama & sesaat sesudah diseret putaran otomatis berhenti (dulu tetap mendorong ke satu
+  // arah, jadi memutar melawannya terasa tertahan), lalu kembali pelan searah putaran terakhir pengguna. Luncuran sesudah
+  // dilepas memakai kecepatan seret yang dihaluskan; jari diam sebelum dilepas = tidak meluncur.
+  const view = { theta: .55, phi: 1.1, r: 150, target: V3(0, 2, 0), vel: 0, drag: null, auto: reduce ? 0 : .045, dir: 1, autoK: 1, idle: 99 };
   stage.addEventListener('pointerdown', e => {
     view.drag = { x: e.clientX, y: e.clientY, theta: view.theta, phi: view.phi, t: performance.now(), moved: false };
+    view.vel = 0; view.autoK = 0;
     stage.setPointerCapture(e.pointerId);
   });
   stage.addEventListener('pointermove', e => {
@@ -544,12 +548,21 @@
     const dx = e.clientX - d.x, dy = e.clientY - d.y;
     if (!d.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
     d.moved = true;
-    const nt = d.theta - dx * .006;
-    view.vel = (nt - view.theta) / Math.max(1 / 120, (performance.now() - d.t) / 1000); d.t = performance.now();
+    const now = performance.now(), nt = d.theta - dx * .006;
+    view.vel = view.vel * .6 + (nt - view.theta) / Math.max(.008, (now - d.t) / 1000) * .4;
+    d.t = now;
     view.theta = nt;
     view.phi = clamp(d.phi - dy * .004, .7, 1.32);
   });
-  const end = e => { if (view.drag) { view.drag = null; try { stage.releasePointerCapture(e.pointerId); } catch (x) { /* sudah lepas */ } } };
+  const end = e => {
+    if (!view.drag) return;
+    if (performance.now() - view.drag.t > 90) view.vel = 0;
+    view.vel = clamp(view.vel, -2.5, 2.5);
+    if (Math.abs(view.vel) > .05) view.dir = Math.sign(view.vel);
+    view.idle = 0;
+    view.drag = null;
+    try { stage.releasePointerCapture(e.pointerId); } catch (x) { /* sudah lepas */ }
+  };
   stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', end);
 
   let wide = false;
@@ -673,7 +686,12 @@
 
   let last = 0, visible = true, running = true;
   function step(dt) {
-    if (!view.drag) { view.theta += (view.auto + view.vel) * dt; view.vel *= Math.pow(.05, dt); }
+    if (!view.drag) {
+      view.idle += dt;
+      if (view.idle > 2.5) view.autoK = Math.min(1, view.autoK + dt / 2);
+      view.theta += (view.auto * view.dir * view.autoK + view.vel) * dt;
+      view.vel *= Math.pow(.08, dt);
+    }
     const sp = Math.sin(view.phi);
     cam.position.set(view.target.x + view.r * sp * Math.sin(view.theta), view.target.y + view.r * Math.cos(view.phi), view.target.z + view.r * sp * Math.cos(view.theta));
     cam.lookAt(view.target);
