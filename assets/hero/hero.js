@@ -523,8 +523,11 @@
       // seperti di VR: awan yang melintas di antara mata dan pulau memudar. Di layar datar awan dekat kamera menutupi seluruh
       // gambar (tampak berkabut), jadi semua awan di sisi kamera (lebih dekat dari jarak kamera–pusat pulau) dihilangkan
       fade *= smooth(clamp((c.obj.position.distanceTo(cam.position) / focus - .82) / .18, 0, 1));
+      // muncul/hilang dengan MENGECIL, bukan transparan: awan setengah tembus di atas latar gelap tampak seperti panel abu-abu
       c.obj.visible = fade > .04;
-      c.mats.forEach(m => { m.opacity = c.alpha * fade; });
+      c.obj.scale.setScalar(c.size * (.2 + .8 * fade));
+      const op = c.alpha * Math.min(1, fade * 4);
+      c.mats.forEach(m => { m.opacity = op; });
     });
   }
   const smooth = u => u * u * (3 - 2 * u);
@@ -638,7 +641,7 @@
         obj.rotation.y = Math.random() * Math.PI * 2;
         obj.scale.setScalar(.85 + Math.random() * .4);
         scene.add(obj);
-        clouds.push({ obj, mats: cm, alpha: cm.length ? cm[0].opacity : 1, phase, z, speed: 2.5 + lane * .16, t: 0, height: 32 + Math.random() * 12 + (Math.abs(z) < 80 ? 35 : 0) });
+        clouds.push({ obj, size: obj.scale.x, mats: cm, alpha: cm.length ? cm[0].opacity : 1, phase, z, speed: 2.5 + lane * .16, t: 0, height: 32 + Math.random() * 12 + (Math.abs(z) < 80 ? 35 : 0) });
       }
     }
 
