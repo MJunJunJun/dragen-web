@@ -11,6 +11,23 @@ Website DraGen: https://dragen.arjuntech.id
 | Logo & foto | `assets/logo.svg`, `assets/img/` |
 | Hero 3D (pulau, naga, burung, awan) | `assets/hero/` |
 | Ekspor pulau dari Unity | `tools/unity-ekspor-pulau.cs` |
+| Bagian Event (event berjalan, hadiah, toko, peringkat 1–100) | `assets/event/` |
+| Fungsi server Vercel (Supabase) | `api/` |
+
+## Event & leaderboard
+
+- `assets/event/events.json`: kalender event, hadiah peringkat & toko event, dibangun dari kode game:
+  `python -I tools/events-from-unity.py "F:/zzzz testing claude/unity/Dragon Dragon"` (jalankan ulang tiap kalender/hadiah berubah).
+- `api/event.js` → `/api/event`: event yang sedang berjalan + peringkat 1–100 dari Supabase (nama & level saja), cache CDN 5 menit.
+- `api/bot-event-daily.js` → Vercel Cron harian 00:10 UTC (07:10 WIB, `vercel.json`): level Menara Event semua pemain bot naik acak per
+  jenis bot (`api/_bots.js`) lalu dikirim ke Supabase (`bot_event_tick`). Sekaligus aktivitas harian supaya Supabase Free tidak di-pause.
+- Uji tanpa jaringan: `node tools/uji-bot-event.js`.
+
+Setup sekali (dilakukan pemilik project, kunci tidak pernah masuk repo):
+1. Supabase → SQL Editor: jalankan `Supabase/schema-v21-bot-peringkat.sql` dari repo game (bot ikut papan & hadiah, fungsi `bot_event_tick`).
+2. Vercel → proyek `dragen-web` → Settings → Environment Variables (Production):
+   `SUPABASE_URL` (Project URL), `SUPABASE_SERVICE_ROLE_KEY` (secret key `sb_secret_…` atau service_role), `CRON_SECRET` (teks acak panjang).
+3. Redeploy. Cek: `/api/event` mengembalikan JSON; Vercel → Cron Jobs → `bot-event-daily` bisa dijalankan manual ("Run").
 
 ## Hero 3D
 

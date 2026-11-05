@@ -1,0 +1,228 @@
+{
+ "events": [
+  {
+   "id": "harvest-2026",
+   "name": "Harvest Festival",
+   "starts": "2026-11-03T00:00:00Z",
+   "coin": "Golden Corn",
+   "boss": "Scarecrow Farmer",
+   "element": "Verdant",
+   "ends": "2026-12-14T00:00:00Z"
+  },
+  {
+   "id": "winter-2026",
+   "name": "Winter Festival",
+   "starts": "2026-12-14T00:00:00Z",
+   "coin": "Snowflake",
+   "boss": "Frost King",
+   "element": "Frost",
+   "ends": "2027-01-06T00:00:00Z"
+  },
+  {
+   "id": "dragonday-2027",
+   "name": "Dragon Day",
+   "starts": "2027-01-06T00:00:00Z",
+   "coin": "Dragon Scale",
+   "boss": "Dragon Hunter",
+   "element": "Granite",
+   "ends": "2027-01-27T00:00:00Z"
+  },
+  {
+   "id": "lunar-2027",
+   "name": "Lunar New Year",
+   "starts": "2027-01-27T00:00:00Z",
+   "coin": "Red Envelope",
+   "boss": "Lion Dancer",
+   "element": "Inferno",
+   "ends": "2027-02-21T00:00:00Z"
+  },
+  {
+   "id": "eid-2027",
+   "name": "Eid Festival",
+   "starts": "2027-02-21T00:00:00Z",
+   "coin": "Lantern Coin",
+   "boss": "Lantern Thief",
+   "element": "Aurum",
+   "ends": "2027-03-18T00:00:00Z"
+  },
+  {
+   "id": "spring-2027",
+   "name": "Spring Festival",
+   "starts": "2027-03-18T00:00:00Z",
+   "coin": "Painted Egg",
+   "boss": "Wild Painter",
+   "element": "Astral",
+   "ends": "2027-04-14T00:00:00Z"
+  },
+  {
+   "id": "splash-2027",
+   "name": "Splash Festival",
+   "starts": "2027-04-14T00:00:00Z",
+   "coin": "Water Drop",
+   "boss": "Splash Captain",
+   "element": "Tide",
+   "ends": "2027-04-28T00:00:00Z"
+  },
+  {
+   "id": "sky-2027",
+   "name": "Sky Festival",
+   "starts": "2027-04-28T00:00:00Z",
+   "coin": "Kite Coin",
+   "boss": "Kite Bandit",
+   "element": "Thunder",
+   "ends": "2027-05-20T00:00:00Z"
+  },
+  {
+   "id": "dragonboat-2027",
+   "name": "Dragon Boat Festival",
+   "starts": "2027-05-20T00:00:00Z",
+   "coin": "Rice Dumpling",
+   "boss": "River Pirate",
+   "element": "Tide",
+   "ends": "2027-06-16T00:00:00Z"
+  },
+  {
+   "id": "summer-2027",
+   "name": "Summer Beach",
+   "starts": "2027-06-16T00:00:00Z",
+   "coin": "Seashell",
+   "boss": "Beach Bully",
+   "element": "Venom",
+   "ends": "2027-07-07T00:00:00Z"
+  },
+  {
+   "id": "star-2027",
+   "name": "Star Festival",
+   "starts": "2027-07-07T00:00:00Z",
+   "coin": "Star Wish",
+   "boss": "Star Thief",
+   "element": "Astral",
+   "ends": "2027-07-24T00:00:00Z"
+  },
+  {
+   "id": "eclipse-2027",
+   "name": "Eclipse",
+   "starts": "2027-07-24T00:00:00Z",
+   "coin": "Sun Shard",
+   "boss": "Sun Eater",
+   "element": "Dark",
+   "ends": "2027-08-12T00:00:00Z"
+  },
+  {
+   "id": "games-2027",
+   "name": "Dragon Games",
+   "starts": "2027-08-12T00:00:00Z",
+   "coin": "Gold Medal",
+   "boss": "Champion Bully",
+   "element": "Granite",
+   "ends": "2027-09-02T00:00:00Z"
+  },
+  {
+   "id": "moon-2027",
+   "name": "Moon Festival",
+   "starts": "2027-09-02T00:00:00Z",
+   "coin": "Mooncake",
+   "boss": "Moon Rabbit",
+   "element": "Frost",
+   "ends": "2027-09-23T00:00:00Z"
+  },
+  {
+   "id": "storm-2027",
+   "name": "Storm Season",
+   "starts": "2027-09-23T00:00:00Z",
+   "coin": "Storm Crystal",
+   "boss": "Storm Caller",
+   "element": "Thunder",
+   "ends": "2027-10-09T00:00:00Z"
+  },
+  {
+   "id": "halloween-2027",
+   "name": "Halloween",
+   "starts": "2027-10-09T00:00:00Z",
+   "coin": "Candy",
+   "boss": "Pumpkin Witch",
+   "element": "Dark",
+   "ends": "2027-11-05T00:00:00Z"
+  },
+  {
+   "id": "anniversary-2027",
+   "name": "DraGen Anniversary",
+   "starts": "2027-11-05T00:00:00Z",
+   "coin": "Party Cake",
+   "boss": "Party Crasher",
+   "element": "Aurum",
+   "ends": "2027-12-03T00:00:00Z"
+  }
+ ],
+ "rankRewards": [
+  {
+   "from": 1,
+   "to": 1,
+   "label": "2 Mythic Eggs"
+  },
+  {
+   "from": 2,
+   "to": 3,
+   "label": "Mythic + Legendary Egg"
+  },
+  {
+   "from": 4,
+   "to": 10,
+   "label": "2 Legendary Eggs"
+  },
+  {
+   "from": 11,
+   "to": 100,
+   "label": "Legendary Egg"
+  },
+  {
+   "from": 101,
+   "to": 1000,
+   "label": "Epic Egg"
+  }
+ ],
+ "shop": [
+  {
+   "id": "egg.event",
+   "name": "{name} Egg",
+   "note": "Exclusive · Legendary {element} dragon",
+   "price": 450,
+   "limit": 1
+  },
+  {
+   "id": "egg.mythic",
+   "name": "{name} Mythic Egg",
+   "note": "Mythic {element} · {edition} dragon",
+   "price": 900,
+   "limit": 1
+  },
+  {
+   "id": "egg.legendary",
+   "name": "Legendary Egg",
+   "note": "Legendary dragon",
+   "price": 320,
+   "limit": 2
+  },
+  {
+   "id": "egg.epic",
+   "name": "Epic Egg",
+   "note": "Epic dragon",
+   "price": 120,
+   "limit": 5
+  },
+  {
+   "id": "egg.rare",
+   "name": "Rare Egg",
+   "note": "Rare dragon",
+   "price": 40,
+   "limit": 10
+  },
+  {
+   "id": "berry",
+   "name": "Berry Basket",
+   "note": "+150 Berry",
+   "price": 25,
+   "limit": 20
+  }
+ ]
+}

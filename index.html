@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
-<link rel="stylesheet" href="/assets/site.css?v=20261101b">
+<link rel="stylesheet" href="/assets/site.css?v=20261105">
 </head>
 <body>
 <div class="backdrop" aria-hidden="true"></div>
@@ -27,6 +27,7 @@
     <nav class="nav" aria-label="Main">
       <a href="#features">Features</a>
       <a class="hide-sm" href="#world">World</a>
+      <a href="#event">Event</a>
       <a href="#community">Community</a>
       <a class="hide-sm" href="/privacy">Privacy</a>
     </nav>
@@ -134,10 +135,50 @@
     </div>
   </section>
 
+  <section id="event" class="wrap section">
+    <div class="section-head">
+      <span class="eyebrow">04 — Live event</span>
+      <h2 id="ev-title">The Event Tower.</h2>
+      <p id="ev-lede">A new themed event takes over the Event Tower every few weeks. Beat three waves and the boss to climb a level, earn event coins for the event shop, and race for the top 100.</p>
+    </div>
+    <div class="event-grid">
+      <article class="card ev-now">
+        <span class="ev-live" id="ev-status">Now running</span>
+        <h3 id="ev-name">Event</h3>
+        <p class="ev-dates" id="ev-dates"></p>
+        <dl class="ev-facts">
+          <div><dt>Boss</dt><dd id="ev-boss">—</dd></div>
+          <div><dt>Event coin</dt><dd id="ev-coin">—</dd></div>
+          <div><dt>Exclusive egg</dt><dd id="ev-egg">—</dd></div>
+        </dl>
+        <p class="ev-next" id="ev-next"></p>
+      </article>
+      <article class="card">
+        <h3>Rank rewards</h3>
+        <p>Paid out once the event ends, by your final rank.</p>
+        <table class="ev-table" id="ev-ranks"><tbody></tbody></table>
+      </article>
+      <article class="card">
+        <h3>Event shop</h3>
+        <p>Spend the event coins you win in the tower.</p>
+        <table class="ev-table" id="ev-shop"><tbody></tbody></table>
+      </article>
+    </div>
+    <div class="board">
+      <div class="board-head">
+        <h3>Leaderboard · top 100</h3>
+        <span class="board-meta" id="ev-meta">Loading…</span>
+      </div>
+      <ol class="board-list" id="ev-board"></ol>
+      <button class="btn board-more" id="ev-more" type="button" hidden>Show all 100</button>
+      <p class="board-note">Ranked by the highest tower level reached in this event. On a tie, whoever got there first ranks higher.</p>
+    </div>
+  </section>
+
   <section id="community" class="wrap section">
     <div class="panel">
       <div>
-        <span class="eyebrow">04 — Community</span>
+        <span class="eyebrow">05 — Community</span>
         <h2>Join the dragon keepers.</h2>
         <p>Our Discord is open: dev updates, playtests and early Alpha access. Or say hi by email.</p>
       </div>
@@ -162,5 +203,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="/assets/hero/naga.js?v=20261101b" defer></script>
 <script src="/assets/hero/hero.js?v=20261101b" defer></script>
+<script src="/assets/event/event.js?v=20261105" defer></script>
 </body>
 </html>
