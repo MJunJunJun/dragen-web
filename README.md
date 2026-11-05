@@ -19,7 +19,8 @@ Website DraGen: https://dragen.arjuntech.id
 - `assets/event/events.json`: kalender event, hadiah peringkat & toko event, dibangun dari kode game:
   `python -I tools/events-from-unity.py "F:/zzzz testing claude/unity/Dragon Dragon"` (jalankan ulang tiap kalender/hadiah berubah).
 - `api/event.js` → `/api/event`: event yang sedang berjalan + peringkat 1–100 dari Supabase (nama & level saja), cache CDN 5 menit.
-- `api/bot-event-daily.js` → Vercel Cron harian 00:10 UTC (07:10 WIB, `vercel.json`): level Menara Event semua pemain bot naik acak per
+- `api/bot-event-daily.js` → Vercel Cron harian 00:10 UTC (07:10 WIB, `vercel.json`; paket Hobby bisa molor sampai 01:10, jadi jam main
+  bot dikunci 02:00–23:00 UTC): level Menara Event semua pemain bot naik acak per
   jenis bot (`api/_bots.js`) lalu dikirim ke Supabase (`bot_event_tick`). Sekaligus aktivitas harian supaya Supabase Free tidak di-pause.
 - Uji tanpa jaringan: `node tools/uji-bot-event.js`.
 
