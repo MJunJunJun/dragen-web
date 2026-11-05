@@ -13,6 +13,7 @@ Website DraGen: https://dragen.arjuntech.id
 | Ekspor pulau dari Unity | `tools/unity-ekspor-pulau.cs` |
 | Bagian Event (event berjalan, hadiah, toko, peringkat 1–100) | `assets/event/` |
 | Fungsi server Vercel (Supabase) | `api/` |
+| Halaman admin (login, pemain, moderasi, hadiah, kode, …) | `admin/`, `api/admin.js` |
 
 ## Event & leaderboard
 
@@ -29,6 +30,26 @@ Setup sekali (dilakukan pemilik project, kunci tidak pernah masuk repo):
 2. Vercel → proyek `dragen-web` → Settings → Environment Variables (Production):
    `SUPABASE_URL` (Project URL), `SUPABASE_SERVICE_ROLE_KEY` (secret key `sb_secret_…` atau service_role), `CRON_SECRET` (teks acak panjang).
 3. Redeploy. Cek: `/api/event` mengembalikan JSON; Vercel → Cron Jobs → `bot-event-daily` bisa dijalankan manual ("Run").
+
+## Halaman admin (`/admin`)
+
+`admin/` (halaman, tanpa build) + `api/admin.js` (satu fungsi Vercel, `?a=<aksi>`) + skema Supabase v22
+(`Supabase/schema-v22-admin-hadiah.sql` di repo game). Isi: Ringkasan, Pemain (cari, profil, ganti nama, bisu chat, ban, hapus akun),
+Moderasi (laporan, chat global), Event (papan dengan tanda bot, jalankan cron), Kotak Hadiah (surat dari "DraGen Team" berisi gold,
+berry, telur, telur/koin event, bibit, kupon, avatar ke pemain tertentu/filter/siaran, terjadwal, kedaluwarsa, paket, hadiah otomatis
+pemain baru & kembali main, tarik kembali), Kode hadiah, Ekonomi (lonjakan gold), Bot, Log admin.
+
+Keamanan: login akun Supabase Auth yang emailnya ada di env `ADMIN_EMAILS`; sesi di cookie `__Host-` HttpOnly/Secure/SameSite=Strict;
+header wajib `X-DraGen-Admin: 1` + Origin sama untuk POST; 5 gagal login per email / 30 total per 15 menit; semua aksi tercatat di
+`admin_log`. Halaman: CSP ketat, `noindex`, `no-store` (`vercel.json`).
+
+Setup sekali:
+1. Supabase → SQL Editor: jalankan `schema-v22-admin-hadiah.sql` (sesudah v21).
+2. Supabase → Authentication → Users → Add user: email admin + password (Auto Confirm). Password hanya diketik pemilik.
+3. Vercel → Environment Variables (Production): `ADMIN_EMAILS` = email admin (pisah koma bila lebih dari satu). Redeploy.
+
+Uji: `node tools/uji-bot-event.js` (cron & `/api/event`), dan di repo game `Supabase/uji_v22_lokal.mjs` (skema v22 di PGlite) /
+`Supabase/uji_v22.py` (sisi pemain di server).
 
 ## Hero 3D
 

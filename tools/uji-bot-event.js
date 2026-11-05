@@ -81,12 +81,20 @@ for (const d of [1, 7, 20, 40]) {
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_tiruan';
   process.env.CRON_SECRET = 'rahasia';
   const calls = [];
+  let rpcTop = false; // false = skema v22 belum dijalankan (RPC 404 → kueri lama)
   const realFetch = global.fetch;
   global.fetch = async (url, opt = {}) => {
     calls.push({ url, opt });
     const u = new URL(url);
-    const json = (data, headers = {}) => ({ ok: true, status: 200, headers: new Map(Object.entries(headers)), text: async () => JSON.stringify(data) });
+    const json = (data, headers = {}, status = 200) => ({ ok: status < 300, status, headers: new Map(Object.entries(headers)), text: async () => JSON.stringify(data) });
     if (u.pathname === '/rest/v1/events') return json([ev]);
+    if (u.pathname === '/rest/v1/rpc/admin_snapshot') return json({ ok: true, day: '2026-11-13' });
+    if (u.pathname === '/rest/v1/admin_log') return json(null, {}, 201);
+    if (u.pathname === '/rest/v1/rpc/event_top_public') {
+      if (!rpcTop) return json({ code: 'PGRST202', message: 'Could not find the function public.event_top_public' }, {}, 404);
+      const top = sorted(10).slice(0, 100).map((r, i) => ({ rank: i + 1, name: 'Bot' + (+r.player_id.slice(1)), level: r.level }));
+      return json({ total: 600, top });
+    }
     if (u.pathname === '/rest/v1/players') {
       const from = +u.searchParams.get('offset'), lim = +u.searchParams.get('limit');
       return json(bots.slice(from, from + lim).map(({ player_name, ...b }) => b));
@@ -113,7 +121,10 @@ for (const d of [1, 7, 20, 40]) {
   assert.ok(ticks.length >= 1 && ticks.every(c => JSON.parse(c.opt.body).p_rows.length <= 500), 'dikirim per ≤ 500 baris');
   assert.equal(r.body.pushed, r.body.playing);
   assert.ok(calls.every(c => c.opt.headers.apikey === 'sb_secret_tiruan' && !c.opt.headers.Authorization), 'kunci sb_secret hanya di apikey');
-  pass++; console.log(`PASS cron mengirim level ${r.body.playing} bot (Lv tertinggi ${r.body.topLevel})`);
+  assert.equal(r.body.snapshot.ok, true, 'rekam harian admin_snapshot ikut jalan');
+  const logged = calls.find(c => c.url.endsWith('/rest/v1/admin_log'));
+  assert.ok(logged && JSON.parse(logged.opt.body).action === 'cron', 'hasil cron dicatat di admin_log');
+  pass++; console.log(`PASS cron mengirim level ${r.body.playing} bot (Lv tertinggi ${r.body.topLevel}) + rekam harian + log`);
 
   r = res(); await event({ headers: {} }, r);
   assert.equal(r.code, 200);
@@ -121,7 +132,15 @@ for (const d of [1, 7, 20, 40]) {
   assert.deepEqual(Object.keys(r.body.top[0]).sort(), ['level', 'name', 'rank']);
   assert.ok(r.body.top.every((x, i) => i === 0 || r.body.top[i - 1].level >= x.level), 'urut level');
   assert.match(r.headers['Cache-Control'], /s-maxage=300/);
-  pass++; console.log(`PASS /api/event: ${r.body.event.id}, ${r.body.total} pemain, #1 ${r.body.top[0].name} Lv ${r.body.top[0].level}`);
+  pass++; console.log(`PASS /api/event (sebelum v22, kueri lama): ${r.body.event.id}, ${r.body.total} pemain, #1 ${r.body.top[0].name} Lv ${r.body.top[0].level}`);
+
+  rpcTop = true; calls.length = 0;
+  r = res(); await event({ headers: {} }, r);
+  assert.equal(r.code, 200);
+  assert.equal(r.body.total, 600);
+  assert.ok(!calls.some(c => c.url.includes('/rest/v1/event_scores')), 'v22: lewat event_top_public (tanpa pemain di-ban)');
+  assert.deepEqual(Object.keys(r.body.top[0]).sort(), ['level', 'name', 'rank']);
+  pass++; console.log('PASS /api/event (sesudah v22): lewat event_top_public');
 
   global.fetch = realFetch;
   console.log(`\n${pass} uji lulus`);

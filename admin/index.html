@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>DraGen Admin</title>
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="/admin/admin.css?v=20261105a">
+</head>
+<body>
+
+<!-- login -->
+<main id="login" class="login" hidden>
+  <form id="login-form" class="card login-card" autocomplete="on">
+    <div class="brand"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>DraGen Admin</span></div>
+    <p class="muted">Masuk dengan akun admin Supabase.</p>
+    <label>Email<input id="login-email" type="email" autocomplete="username" required></label>
+    <label>Password<input id="login-pass" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary" type="submit">Masuk</button>
+    <p id="login-msg" class="msg" role="alert"></p>
+  </form>
+</main>
+
+<!-- aplikasi -->
+<div id="app" class="app" hidden>
+  <header class="top">
+    <div class="brand"><img src="/assets/logo.svg" alt="" width="24" height="24"><span>DraGen Admin</span></div>
+    <nav id="nav" class="nav" aria-label="Menu admin">
+      <a href="#ringkasan">Ringkasan</a>
+      <a href="#pemain">Pemain</a>
+      <a href="#moderasi">Moderasi</a>
+      <a href="#event">Event</a>
+      <a href="#hadiah">Hadiah</a>
+      <a href="#kode">Kode</a>
+      <a href="#ekonomi">Ekonomi</a>
+      <a href="#bot">Bot</a>
+      <a href="#log">Log</a>
+    </nav>
+    <div class="who"><span id="who" class="muted"></span><button id="logout" class="btn ghost sm" type="button">Keluar</button></div>
+  </header>
+  <main id="view" class="view" tabindex="-1"></main>
+</div>
+
+<dialog id="dlg" class="dlg"><form method="dialog" id="dlg-form"></form></dialog>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="/admin/admin.js?v=20261105a"></script>
+</body>
+</html>
