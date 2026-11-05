@@ -40,9 +40,9 @@ function botLevel(bot, ev, now) {
   const wake = (((bot.bot_wake ?? 12) % 24) + 24) % 24, awake = clamp(bot.bot_awake || 14, 6, 20);
   let level = 0, at = 0;
   for (let d = Math.floor(h(seed, id, 'first') * 5); ; d++) { // mulai ikut 0–4 hari sesudah event dibuka
-    // jam main hari itu saat bot terjaga, dikunci di dalam hari UTC-nya (01:00–23:00): cron 00:10 UTC menghitung tepat satu hari,
-    // jadi naik paling banyak 10 per hari seperti pemain asli
-    const play = start + d * DAY + (1 + (wake + h(seed, id, d, 'hour') * awake) % 22) * HOUR;
+    // jam main hari itu saat bot terjaga, dikunci di dalam hari UTC-nya (02:00–23:00): cron 00:10 UTC di paket Hobby bisa molor
+    // sampai 01:10 (jendela 1 jam), jadi tiap jalan tetap menghitung tepat satu hari → naik paling banyak 10 per hari seperti pemain asli
+    const play = start + d * DAY + (2 + (wake + h(seed, id, d, 'hour') * awake) % 21) * HOUR;
     if (play > t || play >= end || play > quitAt) break;
     if (play < since || level >= cap || h(seed, id, d, 'skip') < k.skip) continue;
     const gain = k.gain[0] + Math.floor(h(seed, id, d, 'gain') * (k.gain[1] - k.gain[0] + 1));

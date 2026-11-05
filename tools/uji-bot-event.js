@@ -38,6 +38,18 @@ ok('jam capai di antara awal event dan sekarang', () => {
   for (const r of planRows(bots, ev, now)) {
     const t = Date.parse(r.reached_at);
     assert.ok(t >= Date.parse(ev.starts) && t <= now.getTime(), r.player_id + ' ' + r.reached_at);
+    const hour = new Date(t).getUTCHours();
+    assert.ok(hour >= 2 && hour < 23, r.player_id + ' main jam ' + hour + ' UTC, di dalam jendela cron Hobby 00:10–01:10');
+  }
+});
+
+ok('cron yang molor sampai 01:10 UTC tetap naik paling banyak 10', () => {
+  const late = d => new Date(Date.parse(ev.starts) + d * DAY + 70 * 60000);
+  for (const b of bots) {
+    for (let d = 1; d <= 40; d++) {
+      const a = botLevel(b, ev, at(d)), z = botLevel(b, ev, late(d + 1));
+      assert.ok((z ? z.level : 0) - (a ? a.level : 0) <= 10, `${b.player_id} hari ${d}`);
+    }
   }
 });
 
