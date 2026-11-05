@@ -25,10 +25,15 @@ ranks = [{"from": int(a), "to": int(b), "label": l} for a, b, l in
 
 def tmpl(s):  # string C# berinterpolasi → penanda {name} {element} {edition}
     return (s.replace("{e.name}", "{name}").replace("{Loc.Element(e.element)}", "{element}").replace("{EditionLabel(e.id)}", "{edition}"))
+# harga boleh angka atau konstanta (public const int MythicEggPrice = 10000, LegendaryEggPrice = 3000, …)
+const = {k: int(v) for line in re.findall(r"const int ([^;]+);", rules) for k, v in re.findall(r"(\w+)\s*=\s*(\d+)", line)}
 shop = []
-for m in re.finditer(r'l\.Add\(new ShopItem \{ id = "([^"]+)", name = \$?"([^"]+)", note = \$?"([^"]+)", price = (\d+), limit = (\d+)', rules):
-    sid, name, note, price, limit = m.groups()
-    shop.append({"id": sid, "name": tmpl(name), "note": tmpl(note), "price": int(price), "limit": int(limit)})
+for m in re.finditer(r'l\.Add\(new ShopItem \{ id = "([^"]+)", name = \$?"([^"]+)", note = \$?"([^"]+)", price = (\w+), limit = (\d+)([^}]*)\}', rules):
+    sid, name, note, price, limit, rest = m.groups()
+    item = {"id": sid, "name": tmpl(name), "note": tmpl(note), "price": int(price) if price.isdigit() else const[price], "limit": int(limit)}
+    if re.search(r"eventEgg\s*=\s*true", rest): item["eventEgg"] = True  # telur eksklusif event (Mythic Edisi)
+    shop.append(item)
+if not shop: sys.exit("toko event tidak terbaca dari EventRules.cs: periksa pola ShopItem")
 
 out = {"events": events, "rankRewards": ranks, "shop": shop}
 dst = os.path.join(os.path.dirname(__file__), "..", "assets", "event", "events.json")

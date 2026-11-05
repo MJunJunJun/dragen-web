@@ -2,10 +2,10 @@
 //   node tools/uji-bot-event.js
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { botLevel, planRows, KINDS } = require('../api/_bots');
+const { botLevel, planRows, KINDS, MAX_DAY } = require('../api/_bots');
 
 const DAY = 86400000;
-const ev = { id: 'harvest-2026', starts: '2026-11-03T00:00:00Z', ends: '2026-12-14T00:00:00Z' };
+const ev = { id: 'harvest-2026', starts: '2026-11-03T00:00:00Z', ends: '2026-12-16T00:00:00Z' }; // jadwal 22 hari (v22b): Harvest 3 Nov – 16 Des
 const kinds = Object.keys(KINDS);
 const bots = Array.from({ length: 1000 }, (_, i) => ({
   player_id: 'b' + String(i).padStart(4, '0'), player_name: 'Bot' + i, bot_kind: kinds[i % kinds.length], bot_seed: 1000 + i * 7919,
@@ -20,14 +20,15 @@ ok('deterministik: cron dua kali sehari = hasil sama', () => {
   assert.deepEqual(planRows(bots, ev, at(9)), planRows(bots, ev, at(9)));
 });
 
-ok('level tidak pernah turun & naik paling banyak 10 per hari', () => {
+ok('level tidak pernah turun & naik paling banyak 5 per hari (batas pemain asli)', () => {
+  assert.equal(MAX_DAY, 5);
   for (const b of bots) {
     let prev = 0;
     for (let d = 1; d <= 41; d++) {
       const r = botLevel(b, ev, at(d)), lv = r ? r.level : 0;
       assert.ok(lv >= prev, `${b.player_id} turun di hari ${d}: ${prev} → ${lv}`);
-      assert.ok(lv - prev <= 10, `${b.player_id} naik ${lv - prev} di hari ${d}`);
-      assert.ok(lv <= 10 * d, `${b.player_id} melampaui 10 × hari (${lv} di hari ${d})`);
+      assert.ok(lv - prev <= MAX_DAY, `${b.player_id} naik ${lv - prev} di hari ${d}`);
+      assert.ok(lv <= MAX_DAY * d, `${b.player_id} melampaui 5 × hari (${lv} di hari ${d})`);
       prev = lv;
     }
   }
@@ -43,12 +44,12 @@ ok('jam capai di antara awal event dan sekarang', () => {
   }
 });
 
-ok('cron yang molor sampai 01:10 UTC tetap naik paling banyak 10', () => {
+ok('cron yang molor sampai 01:10 UTC tetap naik paling banyak 5', () => {
   const late = d => new Date(Date.parse(ev.starts) + d * DAY + 70 * 60000);
   for (const b of bots) {
     for (let d = 1; d <= 40; d++) {
       const a = botLevel(b, ev, at(d)), z = botLevel(b, ev, late(d + 1));
-      assert.ok((z ? z.level : 0) - (a ? a.level : 0) <= 10, `${b.player_id} hari ${d}`);
+      assert.ok((z ? z.level : 0) - (a ? a.level : 0) <= MAX_DAY, `${b.player_id} hari ${d}`);
     }
   }
 });
@@ -70,7 +71,7 @@ ok('peringkat 10 teratas berubah tiap hari', () => {
 });
 
 const sorted = d => planRows(bots, ev, at(d)).sort((a, b) => b.level - a.level || Date.parse(a.reached_at) - Date.parse(b.reached_at));
-for (const d of [1, 7, 20, 40]) {
+for (const d of [1, 7, 14, 21, 42]) {
   const rows = sorted(d);
   console.log(`hari ${d}: ${rows.length} bot ikut · #1 Lv ${rows[0].level} · #10 Lv ${rows[9].level} · #100 Lv ${(rows[99] || {}).level}`);
 }

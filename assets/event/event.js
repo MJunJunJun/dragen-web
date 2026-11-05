@@ -36,7 +36,9 @@
     $('ev-dates').textContent = day.format(s) + ' – ' + day.format(e) + ' · ' + left;
     $('ev-boss').textContent = ev.boss;
     $('ev-coin').textContent = ev.coin;
-    $('ev-egg').textContent = 'Legendary ' + ev.element + ' dragon';
+    // telur eksklusif = barang toko bertanda eventEgg (6 Nov: telur Mythic Edisi, satu-satunya telur event)
+    const egg = cal.shop.find(i => i.eventEgg);
+    $('ev-egg').textContent = egg ? text(egg.note, ev) : 'Mythic ' + ev.element + ' dragon';
     $('ev-next').textContent = next ? 'Next up: ' + next.name + ', from ' + day.format(Date.parse(next.starts)) + '.' : '';
 
     $('ev-ranks').tBodies[0].innerHTML = cal.rankRewards.map(r =>

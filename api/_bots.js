@@ -2,21 +2,22 @@
 // rebut hadiah"). Murni (tanpa jaringan) supaya bisa diuji: tools/uji-bot-event.js.
 // Acaknya dari hash (bot, event, hari), jadi hasil satu hari selalu sama: cron yang terpanggil dua kali tidak menaikkan dua kali,
 // cron yang terlewat dikejar keesokan harinya. Tiap hari tiap bot bisa libur, naik sedikit/banyak, dan jam mainnya beda → urutan
-// peringkat berubah tiap hari. Batas server (bot_event_tick, skema v21): 10 × hari event, level tidak pernah turun.
-const DAY = 86400000, HOUR = 3600000;
+// peringkat berubah tiap hari. Naik paling banyak MAX_DAY (5) level sehari = batas pemain asli (6 Nov: maks 5 main sehari, 3 gratis +
+// 2 beli, satu level per kemenangan). Batas server (bot_event_tick, skema v21): 10 × hari event, level tidak pernah turun.
+const DAY = 86400000, HOUR = 3600000, MAX_DAY = 5;
 
-// ikut: peluang ikut event ini · libur: peluang tidak main sehari · naik: level per hari main (maks 10 = batas harian pemain asli)
+// ikut: peluang ikut event ini · libur: peluang tidak main sehari · naik: level per hari main (maks MAX_DAY = batas harian pemain asli)
 // · batas: level tertinggi yang sanggup dicapai timnya di event ini (makin dekat batas makin lambat)
-// Bisa dikejar (pengguna 5 Nov: bot ikut rebut hadiah): bot terkuat ±4–5 level sehari dan berhenti di Lv 45–80, jadi pemain asli
-// yang rajin (maks 10 sehari) bisa menyalip. Naikkan angka di sini untuk papan yang lebih sulit.
+// Bisa dikejar (pengguna 5 Nov: bot ikut rebut hadiah): bot terkuat ±3–4 level sehari dan berhenti di Lv 45–80, jadi pemain asli
+// yang rajin (maks 5 sehari) bisa menyalip. Naikkan angka di sini untuk papan yang lebih sulit.
 const KINDS = {
-  eager:     { join: .85, skip: .08, gain: [3, 7], cap: [45, 80] },
-  fighter:   { join: .85, skip: .1,  gain: [3, 7], cap: [40, 75] },
-  steady:    { join: .7,  skip: .18, gain: [2, 5], cap: [25, 55] },
-  collector: { join: .6,  skip: .22, gain: [1, 4], cap: [15, 40] },
-  farmer:    { join: .5,  skip: .28, gain: [1, 4], cap: [10, 30] },
-  casual:    { join: .45, skip: .38, gain: [1, 3], cap: [5, 20] },
-  quit:      { join: .35, skip: .42, gain: [1, 3], cap: [3, 15] },
+  eager:     { join: .85, skip: .08, gain: [3, 5], cap: [45, 80] },
+  fighter:   { join: .85, skip: .1,  gain: [2, 5], cap: [40, 75] },
+  steady:    { join: .7,  skip: .18, gain: [2, 4], cap: [25, 55] },
+  collector: { join: .6,  skip: .22, gain: [1, 3], cap: [15, 40] },
+  farmer:    { join: .5,  skip: .28, gain: [1, 3], cap: [10, 30] },
+  casual:    { join: .45, skip: .38, gain: [1, 2], cap: [5, 20] },
+  quit:      { join: .35, skip: .42, gain: [1, 2], cap: [3, 15] },
 };
 
 // 0..1 dari bagian-bagian kunci (FNV-1a 32 bit + pengaduk)
@@ -41,12 +42,12 @@ function botLevel(bot, ev, now) {
   let level = 0, at = 0;
   for (let d = Math.floor(h(seed, id, 'first') * 5); ; d++) { // mulai ikut 0–4 hari sesudah event dibuka
     // jam main hari itu saat bot terjaga, dikunci di dalam hari UTC-nya (02:00–23:00): cron 00:10 UTC di paket Hobby bisa molor
-    // sampai 01:10 (jendela 1 jam), jadi tiap jalan tetap menghitung tepat satu hari → naik paling banyak 10 per hari seperti pemain asli
+    // sampai 01:10 (jendela 1 jam), jadi tiap jalan tetap menghitung tepat satu hari → naik paling banyak MAX_DAY per hari seperti pemain asli
     const play = start + d * DAY + (2 + (wake + h(seed, id, d, 'hour') * awake) % 21) * HOUR;
     if (play > t || play >= end || play > quitAt) break;
     if (play < since || level >= cap || h(seed, id, d, 'skip') < k.skip) continue;
     const gain = k.gain[0] + Math.floor(h(seed, id, d, 'gain') * (k.gain[1] - k.gain[0] + 1));
-    level = Math.min(cap, level + clamp(Math.round(gain * Math.pow(1 - level / cap, .6)), 1, 10));
+    level = Math.min(cap, level + clamp(Math.round(gain * Math.pow(1 - level / cap, .6)), 1, MAX_DAY));
     at = play;
   }
   return level > 0 ? { level, reached_at: new Date(at).toISOString() } : null;
@@ -62,4 +63,4 @@ function planRows(bots, ev, now) {
   return rows;
 }
 
-module.exports = { KINDS, h, botLevel, planRows };
+module.exports = { KINDS, MAX_DAY, h, botLevel, planRows };
