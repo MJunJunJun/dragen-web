@@ -23,7 +23,9 @@
   }
 
   function text(t, ev) {
-    return t.replace('{name}', ev.name).replace('{element}', ev.element).replace('{edition}', ev.name + ' Edition ' + new Date(ev.starts).getUTCFullYear());
+    // sama dengan EventRules.EditionLabel: nama edisi khusus (Welcome Festival → "Founder's Edition") atau "<nama event> Edition"
+    const edition = (ev.edition || ev.name + ' Edition') + ' ' + new Date(ev.starts).getUTCFullYear();
+    return t.replace('{name}', ev.name).replace('{element}', ev.element).replace('{edition}', edition);
   }
 
   function fill(cal, ev, next, now) {

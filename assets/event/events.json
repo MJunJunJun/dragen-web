@@ -2,11 +2,12 @@
  "events": [
   {
    "id": "harvest-2026",
-   "name": "Harvest Festival",
+   "name": "Welcome Festival",
    "starts": "2026-11-03T00:00:00Z",
-   "coin": "Golden Corn",
-   "boss": "Scarecrow Farmer",
-   "element": "Verdant",
+   "coin": "Welcome Ticket",
+   "boss": "Party Crasher",
+   "element": "Aurum",
+   "edition": "Founder's Edition",
    "ends": "2026-12-16T00:00:00Z"
   },
   {

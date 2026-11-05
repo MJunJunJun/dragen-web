@@ -13,9 +13,15 @@ element = {e["id"]: e["en"] for e in lang["elements"]}
 def iso(y, m, d): return datetime.datetime(int(y), int(m), int(d), tzinfo=datetime.timezone.utc).isoformat().replace("+00:00", "Z")
 
 events = []
-for m in re.finditer(r'E\("([^"]+)",\s*"([^"]+)",\s*D\((\d+),\s*(\d+),\s*(\d+)\),\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"', cal):
+found = list(re.finditer(r'E\("([^"]+)",\s*"([^"]+)",\s*D\((\d+),\s*(\d+),\s*(\d+)\),\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"', cal))
+for i, m in enumerate(found):
     eid, name, y, mo, d, coin, boss, thrown, el = m.groups()
-    events.append({"id": eid, "name": name, "starts": iso(y, mo, d), "coin": coin, "boss": boss, "element": element.get(el, el)})
+    ev = {"id": eid, "name": name, "starts": iso(y, mo, d), "coin": coin, "boss": boss, "element": element.get(el, el)}
+    # nama edisi naga khusus: .Edition("Founder's Edition") di entri ini (SeasonEvent.editionName); tanpa itu "<nama> Edition"
+    tail = cal[m.end(): found[i + 1].start() if i + 1 < len(found) else len(cal)]
+    ed = re.search(r'\.Edition\("([^"]+)"\)', tail)
+    if ed: ev["edition"] = ed.group(1)
+    events.append(ev)
 last = re.search(r"LastEnd\s*=\s*D\((\d+),\s*(\d+),\s*(\d+)\)", cal).groups()
 for i, e in enumerate(events):  # akhir event = awal event berikutnya (EventCalendar.Build)
     e["ends"] = events[i + 1]["starts"] if i + 1 < len(events) else iso(*last)
