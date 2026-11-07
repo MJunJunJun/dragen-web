@@ -88,6 +88,27 @@ addAll(['pulauku udah mulai rapi', 'ternak naga tuh nyantai banget', 'betah main
   'ga bisa berhenti ngembangin kandang', 'animasi naganya gemes banget', 'hujan-hujan enak ternak naga', 'baru rapihin layout kandang',
   'naga bayinya gemes banget', 'pengen rombak layout pulau lagi'], 'ambient', 'id');
 
+// ---------- SANTUY (English chill / gamer slang; pengguna 7 Nov: "buat kalimat santuy versi inggris") ----------
+addAll(["just vibing with my dragons tbh", "lowkey addicted to this game ngl", "no thoughts, just dragons", "could chill here all day fr",
+  "this is my comfort game not gonna lie", "me and my dragons living our best life", "zero stress, just dragon vibes",
+  "chillin on my island like always", "procrastinating by raising dragons again lol", "my island, my rules",
+  "soft life: just me and the dragons", "nothing beats chilling on the island after a long day", "the dragon sounds are so relaxing ngl",
+  "just here for the good vibes and dragons", "honestly this is peak relaxation", "dragon farming is lowkey my therapy",
+  "slow day, just vibing and breeding", "forever chilling in dragon land", "touch grass? nah, feeding dragons lol",
+  "rainy day energy, perfect for some dragon time", "brain off, dragons on", "living that cozy dragon rancher life",
+  "my ranch is pure chaos but i love it", "in my little dragon bubble rn", "cozy gaming session, do not disturb lol"], 'ambient', 'en');
+addAll(["yo yo gamers", "wassup everyone", "hey hey, back again", "guess who's back lol", "logging in for my daily dragon fix",
+  "sup, just here to chill", "morning, barely awake but here for the dragons lol", "back on the grind, kinda",
+  "hello hello, how we doing", "just popping in to vibe", "aight i'm here, let's chill", "evening dragon session, let's go"], 'greeting', 'en');
+addAll(["lmaooo", "bruh moment", "sheeesh", "that's lowkey fire", "no cap, clean", "big mood", "based", "ez dub", "goes hard ngl",
+  "iconic behavior", "not bad not bad", "ok that's actually sick", "vibes are immaculate rn", "W, respect", "haha that's gold",
+  "oof rip lol", "lowkey impressive", "ayy nice one", "that's the spirit lol", "certified good moment", "ok ok i see you",
+  "that's so clean it hurts", "peak gameplay honestly", "love that for you"], 'reaction', 'en');
+addAll(["anyone else just vibing rn?", "what's everyone up to today?", "y'all still hooked on this too? lol", "how's everyone's island looking?",
+  "who else can't stop playing lol", "what's your comfort dragon?", "anyone just chilling like me?", "what are we all grinding today?"], 'question', 'en');
+addAll(["my {{best}} is lowkey cracked ngl", "not gonna lie, {{best}} is carrying lol", "{{dragons}} dragons and still going strong lol",
+  "my {{best}} hits different at Lv {{bestLevel}} ngl"], 'brag', 'en');
+
 // ---------- bersihkan: token-saja, panjang, karakter, token tak dikenal, duplikat ----------
 const TOKENS = ['best', 'bestRarity', 'bestLevel', 'dragons', 'stage', 'event'];
 const tokenOnly = b => b.replace(/\{\{\w+\}\}/g, '').replace(/[\s!.,?]/g, '').length === 0;
