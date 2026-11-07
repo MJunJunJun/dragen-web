@@ -89,6 +89,7 @@ for (const d of [1, 7, 14, 21, 42]) {
     const u = new URL(url);
     const json = (data, headers = {}, status = 200) => ({ ok: status < 300, status, headers: new Map(Object.entries(headers)), text: async () => JSON.stringify(data) });
     if (u.pathname === '/rest/v1/events') return json([ev]);
+    if (u.pathname === '/rest/v1/bot_chat_config') return json([]); // v23 belum dijalankan di skenario uji ini → botChatPlan nonaktif
     if (u.pathname === '/rest/v1/rpc/admin_snapshot') return json({ ok: true, day: '2026-11-13' });
     if (u.pathname === '/rest/v1/admin_log') return json(null, {}, 201);
     if (u.pathname === '/rest/v1/rpc/event_top_public') {

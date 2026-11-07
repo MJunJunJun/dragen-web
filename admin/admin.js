@@ -694,8 +694,115 @@
         { label: 'Target', get: r => target(r.target) }, { label: 'Detail', cls: 'cut mono', get: r => JSON.stringify(r.detail) }], rows, { empty: 'Belum ada catatan.' })));
   }
 
+  // ---------- BOT CHAT (v23) ----------
+  async function botchat() {
+    const d = await api('botchat');
+    const cfg = d.config || {};
+    const bands = Array.isArray(cfg.bands) && cfg.bands.length === 24 ? cfg.bands.slice() : Array(24).fill(5);
+
+    // pengaturan
+    const enabled = h('input', { type: 'checkbox', checked: !!cfg.enabled });
+    const daily = h('input', { type: 'number', min: 0, max: 5000, value: cfg.daily_count ?? 300 });
+    const quiet = h('input', { type: 'number', min: 0, max: 100000, value: cfg.quiet_real ?? 8 });
+    const busy = h('input', { type: 'number', min: 0, max: 1, step: 0.05, value: cfg.busy_skip ?? 0.5 });
+    const bandInputs = bands.map((v, i) => h('label', { style: 'display:flex;flex-direction:column;gap:2px;font-size:11px', class: 'muted' },
+      h('span', null, String(i).padStart(2, '0') + 'h'), h('input', { type: 'number', min: 0, max: 100, value: v, style: 'width:100%' })));
+    async function saveConfig() {
+      await api('botchat-config', { body: {
+        enabled: enabled.checked, daily_count: Number(daily.value), quiet_real: Number(quiet.value), busy_skip: Number(busy.value),
+        bands: bandInputs.map(l => Number(l.querySelector('input').value)) } });
+      toast('Pengaturan bot chat disimpan.'); route();
+    }
+    const configCard = card('Pengaturan',
+      h('label', { class: 'check' }, enabled, 'Aktifkan bot chat (pesan bot muncul di chat global saat jadwal jatuh tempo)'),
+      h('div', { class: 'two' }, h('label', null, 'Target pesan / hari', daily),
+        h('label', null, 'Ambang "ramai" (pesan pemain asli / 30 mnt)', quiet), h('label', null, 'Bagian dilewati saat ramai (0–1)', busy)),
+      h('h3', null, 'Kepadatan per jam UTC (ritme WIB = UTC+7)'),
+      h('div', { style: 'display:grid;grid-template-columns:repeat(8,1fr);gap:6px' }, bandInputs),
+      h('div', { class: 'row' }, btn('Simpan pengaturan', saveConfig, 'primary')));
+
+    // kalimat
+    const lq = h('input', { type: 'search', placeholder: 'Cari kalimat…' });
+    const llang = h('select', null, [['', 'Semua bahasa'], ['en', 'English'], ['id', 'Indonesia']].map(([v, l]) => h('option', { value: v }, l)));
+    const lcat = h('input', { placeholder: 'kategori (opsional)' });
+    const lact = h('select', null, [['', 'Semua'], ['true', 'Aktif'], ['false', 'Nonaktif']].map(([v, l]) => h('option', { value: v }, l)));
+    const linesBox = h('div', null, h('p', { class: 'loading' }, 'Memuat…'));
+    async function loadLines() {
+      const rows = await api('botchat-lines', { params: { q: lq.value.trim(), lang: llang.value, category: lcat.value.trim(), active: lact.value, limit: 500 } });
+      linesBox.replaceChildren(table([
+        { label: '#', num: true, get: r => r.id }, { label: 'Kalimat', cls: 'cut', get: r => r.body }, { label: 'Bhs', get: r => r.lang },
+        { label: 'Kategori', get: r => r.category }, { label: 'Token', get: r => (r.needs && r.needs.length ? r.needs.join(', ') : '—') },
+        { label: 'Status', get: r => (r.active ? badge('aktif', 'ok') : badge('nonaktif', '')) },
+        { label: '', get: r => h('div', { class: 'row' }, btn('Ubah', () => editLine(r)),
+          btn(r.active ? 'Nonaktifkan' : 'Aktifkan', async () => { await api('botchat-line-save', { body: { id: r.id, body: r.body, category: r.category, lang: r.lang, active: !r.active } }); loadLines(); })) },
+      ], rows, { empty: 'Belum ada kalimat.' }), h('p', { class: 'muted' }, rows.length + ' kalimat (maks 500).'));
+    }
+    async function editLine(r) {
+      const body = h('textarea', { maxlength: 200, value: r ? r.body : '' });
+      const lang = h('select', null, [['en', 'English'], ['id', 'Indonesia']].map(([v, l]) => h('option', { value: v, selected: r && r.lang === v }, l)));
+      const cat = h('input', { value: r ? r.category : 'ambient', maxlength: 40 });
+      if (!(await dialog({ title: r ? 'Ubah kalimat' : 'Kalimat baru', ok: 'Simpan', body: [
+        h('label', null, 'Kalimat (≤ 200 huruf, tanpa < >)', body),
+        h('div', { class: 'two' }, h('label', null, 'Bahasa', lang), h('label', null, 'Kategori', cat)),
+        h('p', { class: 'muted' }, 'Token (diisi game, hanya bot): {{best}} {{bestRarity}} {{bestLevel}} {{dragons}} {{stage}} {{event}}. Jangan kalimat yang hanya berisi token.')] }))) return;
+      await api('botchat-line-save', { body: { id: r ? r.id : null, body: body.value, lang: lang.value, category: cat.value } });
+      toast('Kalimat disimpan.'); loadLines();
+    }
+    async function importLines() {
+      const ta = h('textarea', { rows: 10, placeholder: 'Satu kalimat per baris. Awali "id:" untuk Indonesia atau "en:" untuk Inggris (default en).' });
+      const cat = h('input', { value: 'ambient', maxlength: 40 });
+      if (!(await dialog({ title: 'Impor kalimat massal', ok: 'Impor', body: [h('label', null, 'Kalimat (satu per baris)', ta), h('label', null, 'Kategori untuk semua', cat)] }))) return;
+      const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean).map(s => {
+        let lang = 'en', body = s; const m = s.match(/^(en|id):\s*(.*)$/i); if (m) { lang = m[1].toLowerCase(); body = m[2].trim(); }
+        return { body, lang, category: cat.value.trim() || 'ambient' };
+      }).filter(x => x.body && x.body.length <= 200 && !/[<>]/.test(x.body));
+      if (!lines.length) { toast('Tidak ada kalimat sah.', true); return; }
+      const r = await api('botchat-lines-import', { body: { lines } });
+      toast('Ditambah ' + r.added + ' kalimat.'); loadLines();
+    }
+    const linesForm = h('form', { class: 'row', onsubmit: e => { e.preventDefault(); loadLines(); } }, lq, llang, lcat, lact, h('button', { class: 'btn' }, 'Saring'));
+    loadLines();
+    const linesCard = card('Kalimat bot', h('div', { class: 'row' }, btn('+ Kalimat baru', () => editLine(null), 'primary'), btn('Impor massal', importLines)), linesForm, linesBox);
+
+    // jadwal hari ini
+    const schedBox = h('div', null, h('p', { class: 'loading' }, 'Memuat…'));
+    async function loadSched() {
+      const rows = await api('botchat-schedule', { params: { limit: 500 } });
+      schedBox.replaceChildren(table([
+        { label: 'Jam (UTC)', get: r => when(r.at) }, { label: 'Bot', get: r => r.bot }, { label: 'Kalimat', cls: 'cut', get: r => r.body },
+        { label: 'Status', get: r => (r.sent ? badge('terkirim', 'ok') : r.released ? badge('dilewati', '') : badge('menunggu', 'warn')) },
+        { label: '', get: r => btn('Hapus', async () => { await api('botchat-delete', { body: { scope: 'one', id: r.id } }); loadSched(); }, 'danger') },
+      ], rows, { empty: 'Belum ada jadwal hari ini. Cron menyusun tiap 00:10 UTC saat fitur aktif.' }));
+    }
+    loadSched();
+    const schedCard = card('Jadwal hari ini (UTC)',
+      h('div', { class: 'row' }, btn('Muat ulang', loadSched), btn('Hapus semua yang menunggu', async () => {
+        if (!(await dialog({ title: 'Hapus semua jadwal yang belum tayang?', ok: 'Hapus', danger: true }))) return;
+        const r = await api('botchat-delete', { body: { scope: 'upcoming' } }); toast('Dihapus ' + r.deleted + ' jadwal.'); loadSched();
+      }, 'danger')), schedBox);
+
+    async function sendNow() {
+      const body = h('textarea', { maxlength: 200, placeholder: 'Kosongkan untuk kalimat aktif acak.' });
+      if (!(await dialog({ title: 'Kirim pesan bot uji sekarang', ok: 'Kirim', body: [h('label', null, 'Kalimat (opsional)', body),
+        h('p', { class: 'muted' }, 'Satu pesan bot acak langsung muncul di chat global. Token tidak diisi di sini (hanya di game).')] }))) return;
+      await api('botchat-send-now', { body: { body: body.value } });
+      toast('Terkirim sebagai pesan bot.'); loadSched();
+    }
+
+    return h('div', null,
+      h('div', { class: 'head' }, h('h1', null, 'Bot chat'), h('div', { class: 'row' }, btn('Kirim uji', sendNow), btn('Muat ulang', route))),
+      h('div', { class: 'tiles' },
+        tile('Status', cfg.enabled ? 'Aktif' : 'Nonaktif', cfg.enabled ? 'ok' : 'warn'), tile('Target / hari', n(cfg.daily_count)),
+        tile('Kalimat aktif', n(d.lines.active) + ' / ' + n(d.lines.total)), tile('Terjadwal hari ini', n(d.today.scheduled)),
+        tile('Terkirim hari ini', n(d.today.sent), 'ok'), tile('Menunggu', n(d.today.upcoming))),
+      h('p', { class: 'muted' }, 'Bot hanya menulis suasana (sapaan, pamer, komentar event, reaksi) dan tak pernah membalas/menyebut pemain asli. Pesan muncul di chat global dengan jam aslinya saat pemain membuka chat.'),
+      h('div', { class: 'grid cols-2' }, configCard,
+        card('Terkirim terbaru', table([{ label: 'Jam', get: r => ago(r.at) }, { label: 'Bot', get: r => r.name }, { label: 'Pesan', cls: 'cut', get: r => r.body }], d.recent, { empty: 'Belum ada pesan bot.' }))),
+      schedCard, linesCard);
+  }
+
   // ---------- router & login ----------
-  const VIEWS = { ringkasan, pemain, moderasi, event: eventView, hadiah, kode, ekonomi, bot, log: logView };
+  const VIEWS = { ringkasan, pemain, moderasi, event: eventView, hadiah, kode, ekonomi, bot, botchat, log: logView };
   let routeToken = 0;
   async function route() {
     const [name, arg] = (location.hash.slice(1) || 'ringkasan').split('/');

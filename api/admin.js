@@ -177,6 +177,29 @@ const H = {
   cron: { post: true, fn: async (q, b, me) => runDaily(me) },
   economy: { fn: async () => rpc('admin_economy') },
   bots: { fn: async () => rpc('admin_bots') },
+  // ---- chat bot (v23) ----
+  botchat: { fn: async () => rpc('admin_botchat') },
+  'botchat-config': {
+    post: true,
+    fn: async (q, b, me) => {
+      const p = {};
+      if (b.enabled !== undefined) p.enabled = !!b.enabled;
+      if (b.daily_count !== undefined && b.daily_count !== '') p.daily_count = int(b.daily_count, 0, 5000);
+      if (b.quiet_real !== undefined && b.quiet_real !== '') p.quiet_real = int(b.quiet_real, 0, 100000);
+      if (b.busy_skip !== undefined && b.busy_skip !== '') { const n = Number(b.busy_skip); need(Number.isFinite(n) && n >= 0 && n <= 1, 'busy_skip harus 0–1'); p.busy_skip = n; }
+      if (b.bands !== undefined) { need(Array.isArray(b.bands) && b.bands.length === 24, 'bands harus 24 angka'); p.bands = b.bands.map(x => { const n = Number(x); need(Number.isFinite(n) && n >= 0, 'bands angka ≥ 0'); return n; }); }
+      return ok(await rpc('admin_botchat_config', { p, p_admin: me }));
+    },
+  },
+  'botchat-lines': { fn: async q => rpc('admin_botchat_lines', { p_q: text(q.q, 80), p_lang: text(q.lang, 4), p_category: text(q.category, 40), p_active: text(q.active, 8), p_limit: int(q.limit, 1, 2000, 300) }) },
+  'botchat-line-save': {
+    post: true,
+    fn: async (q, b, me) => ok(await rpc('admin_botchat_line_save', { p: { id: b.id || null, body: text(b.body, 200), category: text(b.category || 'ambient', 40), lang: text(b.lang || 'en', 4), active: b.active }, p_admin: me })),
+  },
+  'botchat-lines-import': { post: true, fn: async (q, b, me) => { need(Array.isArray(b.lines), 'lines harus array'); return ok(await rpc('admin_botchat_lines_import', { p: b.lines.slice(0, 5000), p_admin: me })); } },
+  'botchat-schedule': { fn: async q => rpc('admin_botchat_schedule', { p_day: q.day ? text(q.day, 10) : null, p_limit: int(q.limit, 1, 2000, 500) }) },
+  'botchat-delete': { post: true, fn: async (q, b, me) => ok(await rpc('admin_botchat_delete', { p: { scope: text(b.scope, 16), id: b.id || null }, p_admin: me })) },
+  'botchat-send-now': { post: true, fn: async (q, b, me) => ok(await rpc('admin_botchat_send_now', { p: { bot_id: b.bot_id || null, body: text(b.body, 200) }, p_admin: me })) },
   'mail-preview': { post: true, fn: async (q, b) => rpc('admin_mail_preview', { p_target: targetOf(b.target) }) },
   'mail-send': { post: true, fn: async (q, b, me) => ok(await rpc('admin_mail_send', { p: campaign(b), p_admin: me })) },
   'mail-campaigns': { fn: async () => rpc('admin_mail_campaigns', { p_limit: 200 }) },
