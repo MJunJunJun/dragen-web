@@ -109,6 +109,34 @@ addAll(["anyone else just vibing rn?", "what's everyone up to today?", "y'all st
 addAll(["my {{best}} is lowkey cracked ngl", "not gonna lie, {{best}} is carrying lol", "{{dragons}} dragons and still going strong lol",
   "my {{best}} hits different at Lv {{bestLevel}} ngl"], 'brag', 'en');
 
+// ---------- LUCU (English dragon jokes / puns; pengguna 7 Nov: "buat kalimat yang lucu"; kategori 'joke') ----------
+addAll(["my dragons eat better than i do honestly", "told my dragon a joke, it just breathed fire, tough crowd",
+  "my dragon's self esteem is higher than mine fr", "spent 3 hours decorating my island, productivity who?",
+  "me: i'll play 5 mins. also me: 3 hours later", "my dragons have a better morning routine than me",
+  "pretty sure my dragon pays more rent than me", "i came for the dragons, i stayed for the dragons",
+  "my therapist: dragons aren't real. my dragons: ...", "breaking news: local gamer feeds dragons, forgets to eat",
+  "my dragon looked at me like i owe it money", "sleep is just a loading screen between dragon sessions",
+  "i don't have a favorite dragon, i have twelve favorites", "status: emotionally attached to pixelated dragons",
+  "my dragon snores and i did not consent to this", "plot twist: the dragons are raising ME",
+  "my dragon has main character energy, i'm just staff", "achievement unlocked: talked to dragons more than humans today",
+  "my island has better feng shui than my actual room", "my dragon flexed and now i feel insecure",
+  "i named a dragon Steve and he's thriving", "warning: may abandon all responsibilities for dragon eggs",
+  "my dragon side-eyed me and i felt that", "i don't cry, my dragon just hatched something in my eye",
+  "my dragon's glow up is more consistent than mine", "i whisper good job to my dragons, they ignore me, classic",
+  "my dragon's wingspan is bigger than my future", "day 47 of asking my dragon to love me back",
+  "my dragon has the audacity to be cuter than me", "my bank account is empty but my dragon hoard is full, priorities",
+  "tried to quit, the dragons said no", "my dragon respects no one, especially not me",
+  "i would take a fireball for these little guys", "introduced my dragons to each other, now they have drama",
+  "my dragon's vibe is immaculate, mine is questionable", "i put my dragon first and myself like, seventh",
+  "my dragon has never paid taxes and it shows", "me explaining dragon lore to people who didn't ask",
+  "my dragon believes in me more than i do", "that was dragon-tastic ngl", "feeling a little scale-ptical about this egg",
+  "this egg situation is un-be-wing-able", "i'm just winging it tbh", "i've got a whole hoard of dragon puns",
+  "i'm on fire today, my dragon helped", "claw-some day on the island fr", "no egg-scuses, time to grind",
+  "hatch me if you can", "my {{best}} has main character energy, i'm just staff",
+  "{{dragons}} dragons and zero life decisions, living the dream", "my {{best}} woke up and chose violence today",
+  "{{dragons}} dragons later and i regret nothing", "my dragon judges my decorating choices daily",
+  "i have commitment issues but not with these dragons"], 'joke', 'en');
+
 // ---------- bersihkan: token-saja, panjang, karakter, token tak dikenal, duplikat ----------
 const TOKENS = ['best', 'bestRarity', 'bestLevel', 'dragons', 'stage', 'event'];
 const tokenOnly = b => b.replace(/\{\{\w+\}\}/g, '').replace(/[\s!.,?]/g, '').length === 0;
