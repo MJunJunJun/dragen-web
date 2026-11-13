@@ -102,6 +102,7 @@ for (const d of [1, 7, 14, 21, 42]) {
       return json(bots.slice(from, from + lim).map(({ player_name, ...b }) => b));
     }
     if (u.pathname === '/rest/v1/rpc/bot_event_tick') return json({ ok: true, rows: JSON.parse(opt.body).p_rows.length });
+    if (u.pathname === '/rest/v1/rpc/bot_stage_tick') return json({ ok: true, rows: JSON.parse(opt.body).p_rows.length }); // v29 stage bot
     if (u.pathname === '/rest/v1/event_scores') {
       const rows = sorted(10).slice(0, 100).map(r => ({ level: r.level, reached_at: r.reached_at, players: { player_name: 'Bot' + (+r.player_id.slice(1)) } }));
       return json(rows, { 'content-range': '0-99/' + planRows(bots, ev, at(10)).length });
@@ -118,7 +119,11 @@ for (const d of [1, 7, 14, 21, 42]) {
   calls.length = 0; r = res(); await daily({ headers: { authorization: 'Bearer rahasia' } }, r);
   assert.equal(r.code, 200, JSON.stringify(r.body));
   assert.equal(r.body.bots, 1000);
-  assert.equal(calls.filter(c => c.url.includes('/rest/v1/players')).length, 2, 'halaman 1000 baris + halaman kosong');
+  // level event (kolom jadwal main) dan stage 3v3 (v29) masing-masing: halaman 1000 baris + halaman kosong
+  assert.equal(calls.filter(c => c.url.includes('/rest/v1/players') && c.url.includes('bot_wake')).length, 2, 'halaman 1000 baris + halaman kosong');
+  assert.equal(calls.filter(c => c.url.includes('/rest/v1/players') && !c.url.includes('bot_wake')).length, 2, 'stage bot: halaman 1000 baris + halaman kosong');
+  assert.equal(r.body.stage.ok, true, 'stage bot ikut jalan: ' + JSON.stringify(r.body.stage));
+  assert.equal(r.body.stage.pushed, r.body.stage.ranked);
   const ticks = calls.filter(c => c.url.endsWith('/rpc/bot_event_tick'));
   assert.ok(ticks.length >= 1 && ticks.every(c => JSON.parse(c.opt.body).p_rows.length <= 500), 'dikirim per ≤ 500 baris');
   assert.equal(r.body.pushed, r.body.playing);

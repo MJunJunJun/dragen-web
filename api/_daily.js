@@ -1,11 +1,13 @@
 // Pekerjaan harian (Vercel Cron 00:10 UTC lewat /api/bot-event-daily, atau tombol "Jalankan sekarang" di /admin):
 // 1. level Menara Event semua pemain bot dihitung (api/_bots.js) lalu dikirim ke Supabase lewat bot_event_tick (skema v21)
+// 1b. stage 3v3 terbaik pemain bot (api/_botstage.js) → bot_stage_tick (skema v29), papan peringkat stage
 // 2. rekam harian admin_snapshot (skema v22): jumlah pemain, aktif, baru, peserta event, gold/berry pemain asli (lonjakan)
 // 3. hasilnya dicatat di admin_log (action "cron") supaya halaman admin tahu kapan terakhir jalan
 // Sekaligus aktivitas database harian, jadi project Supabase Free tidak di-pause karena sepi.
 const { sb, rpc, currentEvent } = require('./_supabase');
 const { planRows } = require('./_bots');
 const { planSchedule } = require('./_botchat');
+const { planStageRows } = require('./_botstage');
 
 const PAGE = 1000, CHUNK = 500;
 
@@ -66,8 +68,29 @@ async function botChatPlan(now = new Date()) {
   return { ok: true, enabled: true, day, planned: rows.length, written, lines: lines.length, event: ev ? ev.id : null };
 }
 
+// Stage 3v3 terbaik pemain bot (skema v29): dihitung api/_botstage.js lalu ditulis ke players.best_3v3 lewat bot_stage_tick —
+// papan peringkat stage, kartu profil bot di game, dan website memakai angka server yang sama (pengguna 13 Nov)
+async function botStageTick(now) {
+  const bots = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data } = await sb(`/rest/v1/players?select=player_id,bot_seed,bot_kind,bot_since,bot_quit&is_bot=eq.true`
+      + `&order=player_id.asc&limit=${PAGE}&offset=${from}`);
+    bots.push(...(data || []));
+    if (!data || data.length < PAGE) break;
+  }
+  const rows = planStageRows(bots, now);
+  let pushed = 0;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const data = await rpc('bot_stage_tick', { p_rows: rows.slice(i, i + CHUNK) });
+    if (!data || !data.ok) throw new Error('bot_stage_tick: ' + JSON.stringify(data));
+    pushed += data.rows || 0;
+  }
+  return { ok: true, bots: bots.length, ranked: rows.length, pushed, top: rows.reduce((m, r) => Math.max(m, r.stage), 0) };
+}
+
 async function runDaily(by = 'cron', now = new Date()) {
   const out = { ok: true, ...(await botTick(now)) };
+  try { out.stage = await botStageTick(now); } catch (e) { out.stage = { ok: false, error: String(e.message || e).slice(0, 160) }; }
   try { out.botchat = await botChatPlan(now); } catch (e) { out.botchat = { ok: false, error: String(e.message || e).slice(0, 160) }; }
   try { out.snapshot = await rpc('admin_snapshot'); } catch (e) { out.snapshot = { ok: false, error: String(e.message || e).slice(0, 160) }; }
   try {
@@ -77,4 +100,4 @@ async function runDaily(by = 'cron', now = new Date()) {
   return out;
 }
 
-module.exports = { runDaily, botTick, botChatPlan };
+module.exports = { runDaily, botTick, botChatPlan, botStageTick };
