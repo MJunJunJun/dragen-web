@@ -67,7 +67,8 @@ ok('peringkat 10 teratas berubah tiap hari', () => {
     .slice(0, 10).map(r => r.player_id).join(',');
   let changes = 0;
   for (let d = 2; d <= 30; d++) if (rank(d) !== rank(d - 1)) changes++;
-  assert.ok(changes >= 20, 'hanya berubah ' + changes + ' dari 29 hari');
+  // 16 Nov: event kini mengikuti stage 3v3 (sinkron) → urutan lebih stabil, tapi tetap bergerak lebih dari separuh hari
+  assert.ok(changes >= 15, 'hanya berubah ' + changes + ' dari 29 hari');
 });
 
 const sorted = d => planRows(bots, ev, at(d)).sort((a, b) => b.level - a.level || Date.parse(a.reached_at) - Date.parse(b.reached_at));
@@ -150,5 +151,18 @@ for (const d of [1, 7, 14, 21, 42]) {
   pass++; console.log('PASS /api/event (sesudah v22): lewat event_top_public');
 
   global.fetch = realFetch;
-  console.log(`\n${pass} uji lulus`);
+  ok('sinkron dengan peringkat stage 3v3 (pengguna 16 Nov: jangan sampai #1 di 3v3 jadi #50 di event)', () => {
+  const { botStage } = require('../api/_botstage');
+  for (const d of [12, 20]) {
+    const now = at(d);
+    const st = bots.map(b => ({ id: b.player_id, s: botStage(b, now) })).sort((a, b) => b.s - a.s);
+    const evr = planRows(bots, ev, now).sort((a, b) => b.level - a.level || Date.parse(a.reached_at) - Date.parse(b.reached_at));
+    const rank = new Map(evr.map((r, i) => [r.player_id, i + 1]));
+    assert.ok((rank.get(st[0].id) || 9999) <= 3, `hari ${d}: #1 stage 3v3 di peringkat event ${rank.get(st[0].id)}`);
+    const both = st.slice(0, 50).filter(x => (rank.get(x.id) || 9999) <= 50).length;
+    assert.ok(both >= 35, `hari ${d}: hanya ${both}/50 bot 50 besar 3v3 ada di 50 besar event`);
+  }
+});
+
+console.log(`\n${pass} uji lulus`);
 })().catch(e => { console.error('FAIL', e); process.exit(1); });
