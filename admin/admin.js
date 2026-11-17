@@ -107,7 +107,7 @@
     ['AstralFig', 'Astral Fig'], ['AstralPear', 'Astral Pear']];
   const KEYS = [...SEEDS.map(([id, nm]) => ['Seed:' + id, 'Bibit ' + nm]), ['GoldCoupon:1', 'Kupon Gold 1 jam'], ['GoldCoupon:2', 'Kupon Gold 2 jam'],
     ['GoldCoupon:3', 'Kupon Gold 3 jam'], ['Shard:Mythic', 'Mythic Shard'], ['Shard:Legendary', 'Legendary Shard']];
-  const TYPES = [['gold', 'Gold'], ['berry', 'Berry'], ['egg', 'Telur kelangkaan (jenis acak, tanpa naga event)'], ['event_egg', 'Telur eksklusif event (Naga Edisi)'],
+  const TYPES = [['gold', 'Gold'], ['berry', 'Berry'], ['egg', 'Telur kelangkaan (jenis acak, tanpa naga event)'], ['event_egg', 'Telur event (elemen event + kelangkaan)'],
     ['event_coin', 'Koin event'], ['item', 'Item tas'], ['avatar', 'Item avatar']];
   const KINDS = { gift: 'Hadiah', notice: 'Pengumuman', compensation: 'Kompensasi', welcome: 'Otomatis: pemain baru', comeback: 'Otomatis: kembali main', code: 'Kode' };
   const REASONS = { spam: 'Spam', rude: 'Kasar', cheating: 'Curang', name: 'Nama tidak pantas', other: 'Lainnya' };
@@ -126,7 +126,7 @@
       case 'gold': return n(it.amount) + ' Gold';
       case 'berry': return n(it.amount) + ' Berry';
       case 'egg': return it.count + '× Telur ' + (RARITY[it.rarity] || '?');
-      case 'event_egg': return it.count + '× Telur Legendaris ' + evName(it.event);
+      case 'event_egg': return it.count + '× Telur ' + (RARITY[it.rarity ?? 3] || 'Legendaris') + ' ' + evName(it.event);
       case 'event_coin': return n(it.amount) + ' ' + evCoin(it.event);
       case 'item': return n(it.amount) + '× ' + ((KEYS.find(k => k[0] === it.key) || [])[1] || it.key);
       case 'avatar': return 'Avatar ' + it.key;
@@ -148,7 +148,10 @@
         case 'gold': case 'berry': return [num('amount', 'Jumlah', it.amount || (t === 'gold' ? 1000 : 100), 100000000)];
         case 'egg': return [h('label', null, 'Kelangkaan', h('select', { 'data-k': 'rarity' }, RARITY.map((r, i) => h('option', { value: i, selected: i === (it.rarity ?? 2) }, r)))),
           num('count', 'Jumlah telur', it.count || 1, 50), h('small', { class: 'muted' }, 'Jenis naga acak per telur, tidak pernah Naga Edisi event.')];
-        case 'event_egg': return [evSel(it.event || evNow()), num('count', 'Jumlah telur', it.count || 1, 50), h('small', { class: 'muted' }, 'Isi: Naga Edisi event terpilih, kelangkaan Legendaris.')];
+        // pengguna 17 Nov: telur event juga bisa diatur kelangkaannya (game: GiftMail → AddRarityEgg(rarity) + MakeEventEgg)
+        case 'event_egg': return [evSel(it.event || evNow()),
+          h('label', null, 'Kelangkaan', h('select', { 'data-k': 'rarity' }, RARITY.map((r, i) => h('option', { value: i, selected: i === (it.rarity ?? 3) }, r)))),
+          num('count', 'Jumlah telur', it.count || 1, 50), h('small', { class: 'muted' }, 'Naga berelemen event terpilih, jenis acak, kelangkaan sesuai pilihan (bukan Naga Edisi).')];
         case 'event_coin': return [evSel(it.event || evNow()), num('amount', 'Jumlah koin', it.amount || 50, 1000000)];
         case 'item': return [h('label', null, 'Item', h('select', { 'data-k': 'key' }, KEYS.map(([k, l]) => h('option', { value: k, selected: k === it.key }, l)))),
           num('amount', 'Jumlah', it.amount || 1, 100000)];
