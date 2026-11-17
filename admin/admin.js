@@ -107,7 +107,7 @@
     ['AstralFig', 'Astral Fig'], ['AstralPear', 'Astral Pear']];
   const KEYS = [...SEEDS.map(([id, nm]) => ['Seed:' + id, 'Bibit ' + nm]), ['GoldCoupon:1', 'Kupon Gold 1 jam'], ['GoldCoupon:2', 'Kupon Gold 2 jam'],
     ['GoldCoupon:3', 'Kupon Gold 3 jam'], ['Shard:Mythic', 'Mythic Shard'], ['Shard:Legendary', 'Legendary Shard']];
-  const TYPES = [['gold', 'Gold'], ['berry', 'Berry'], ['egg', 'Telur (kelangkaan)'], ['event_egg', 'Telur eksklusif event'],
+  const TYPES = [['gold', 'Gold'], ['berry', 'Berry'], ['egg', 'Telur kelangkaan (jenis acak, tanpa naga event)'], ['event_egg', 'Telur eksklusif event (Naga Edisi)'],
     ['event_coin', 'Koin event'], ['item', 'Item tas'], ['avatar', 'Item avatar']];
   const KINDS = { gift: 'Hadiah', notice: 'Pengumuman', compensation: 'Kompensasi', welcome: 'Otomatis: pemain baru', comeback: 'Otomatis: kembali main', code: 'Kode' };
   const REASONS = { spam: 'Spam', rude: 'Kasar', cheating: 'Curang', name: 'Nama tidak pantas', other: 'Lainnya' };
@@ -138,13 +138,17 @@
   function itemEditor(initial) {
     const list = h('div', { class: 'items' });
     const num = (k, label, v, max) => h('label', null, label, h('input', { type: 'number', min: 1, max, step: 1, value: v, 'data-k': k, required: true }));
-    const evSel = v => h('label', null, 'Event', h('select', { 'data-k': 'event' }, EVENTS.map(e => h('option', { value: e.id, selected: e.id === v }, e.name))));
+    // pengguna 17 Nov: event bisa "sekarang" atau diganti event lain — tandai yang sedang berjalan + tanggalnya
+    const evTag = e => { const t = Date.now(), a = Date.parse(e.starts), b = Date.parse(e.ends);
+      const d = x => new Date(x).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      return e.name + (t >= a && t < b ? ' (SEDANG BERJALAN)' : t < a ? ' (mulai ' + d(a) + ')' : ' (selesai ' + d(b) + ')'); };
+    const evSel = v => h('label', null, 'Event', h('select', { 'data-k': 'event' }, EVENTS.map(e => h('option', { value: e.id, selected: e.id === v }, evTag(e)))));
     function fields(t, it) {
       switch (t) {
         case 'gold': case 'berry': return [num('amount', 'Jumlah', it.amount || (t === 'gold' ? 1000 : 100), 100000000)];
         case 'egg': return [h('label', null, 'Kelangkaan', h('select', { 'data-k': 'rarity' }, RARITY.map((r, i) => h('option', { value: i, selected: i === (it.rarity ?? 2) }, r)))),
-          num('count', 'Jumlah telur', it.count || 1, 50)];
-        case 'event_egg': return [evSel(it.event || evNow()), num('count', 'Jumlah telur', it.count || 1, 50)];
+          num('count', 'Jumlah telur', it.count || 1, 50), h('small', { class: 'muted' }, 'Jenis naga acak per telur, tidak pernah Naga Edisi event.')];
+        case 'event_egg': return [evSel(it.event || evNow()), num('count', 'Jumlah telur', it.count || 1, 50), h('small', { class: 'muted' }, 'Isi: Naga Edisi event terpilih, kelangkaan Legendaris.')];
         case 'event_coin': return [evSel(it.event || evNow()), num('amount', 'Jumlah koin', it.amount || 50, 1000000)];
         case 'item': return [h('label', null, 'Item', h('select', { 'data-k': 'key' }, KEYS.map(([k, l]) => h('option', { value: k, selected: k === it.key }, l)))),
           num('amount', 'Jumlah', it.amount || 1, 100000)];
